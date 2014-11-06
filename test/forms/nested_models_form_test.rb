@@ -13,14 +13,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
   end
 
   test "declares both sub-forms" do
-    assert_equal 2, UserWithEmailAndProfileFormFixture.forms.size
     assert_equal 2, @form.forms.size
-  end
-
-  test "forms list contains profile sub-form definition" do
-    profile_definition = UserWithEmailAndProfileFormFixture.forms.last
-
-    assert_equal :profile, profile_definition.assoc_name
   end
 
   test "profile sub-form contains association name and parent" do
