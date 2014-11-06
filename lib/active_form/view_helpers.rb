@@ -27,7 +27,7 @@ module ActiveForm
       partial = get_partial_path(custom_partial, association)
       locals =  render_options.delete(:locals) || {}
       method_name = f.respond_to?(:semantic_fields_for) ? :semantic_fields_for : (f.respond_to?(:simple_fields_for) ? :simple_fields_for : :fields_for)
-      
+
       f.send(method_name, association, new_object, {:child_index => "new_#{association}"}.merge(render_options)) do |builder|
         partial_options = {form_name.to_sym => builder, :dynamic => true}.merge(locals)
         render(partial, partial_options)
@@ -55,10 +55,10 @@ module ActiveForm
       html_options[:'data-association-insertion-template'] = CGI.escapeHTML(render_association(association, f, new_object, form_parameter_name, render_options, override_partial).to_str).html_safe
 
       html_options[:'data-count'] = count if count > 0
-        
+
       link_to(name, '#', html_options)
     end
-    
+
     def create_object(f, association)
       f.object.get_model(association)
     end

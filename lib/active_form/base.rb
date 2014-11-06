@@ -5,16 +5,16 @@ module ActiveForm
 
     define_model_callbacks :save, only: [:after]
     after_save :update_form_models
-    
+
     delegate :persisted?, :to_model, :to_key, :to_param, :to_partial_path, to: :model
     attr_reader :model, :forms
-    
+
     def initialize(model)
       @model = model
       @forms = []
       populate_forms
     end
-    
+
     def submit(params)
       params.each do |key, value|
         if nested_params?(value)
@@ -34,7 +34,7 @@ module ActiveForm
       if valid?
         run_callbacks :save do
           ActiveRecord::Base.transaction do
-              model.save
+            model.save
           end
         end
       else
@@ -48,7 +48,7 @@ module ActiveForm
 
       collect_errors_from(model)
       aggregate_form_errors
-      
+
       errors.empty?
     end
 

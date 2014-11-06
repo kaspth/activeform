@@ -30,7 +30,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
 
   test "profile sub-form declares attributes" do
     attributes = [:twitter_name, :twitter_name=, :github_name, :github_name=]
-    
+
     attributes.each do |attribute|
       assert_respond_to @profile_form, attribute
     end
@@ -42,7 +42,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
 
     assert_equal "twitter_peter", @profile_form.twitter_name
     assert_equal "twitter_peter", @profile_form.model.twitter_name
-    
+
     assert_equal "github_peter", @profile_form.github_name
     assert_equal "github_peter", @profile_form.model.github_name
   end
@@ -138,7 +138,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert_equal "petrakos@gmail.com", @form.email.address
     assert_equal "t_peter", @profile_form.twitter_name
     assert_equal "g_peter", @profile_form.github_name
-    
+
     assert @form.persisted?
     assert @form.email.persisted?
     assert @profile_form.persisted?
@@ -182,7 +182,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
       name: peter.name,
       age: "23",
       gender: "0",
-      
+
       email_attributes: {
         address: peter.email.address
       },

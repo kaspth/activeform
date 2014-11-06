@@ -17,7 +17,7 @@ class ProjectFormFixture < ActiveForm::Base
 
   association :project_tags do
     attribute :tag_id
-    
+
     association :tag do
       attribute :name
     end
