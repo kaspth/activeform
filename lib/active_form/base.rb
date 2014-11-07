@@ -1,54 +1,37 @@
-require 'active_form/abstract_form'
-
 module ActiveForm
-  class Base < AbstractForm
-    include ActiveModel::Model
-
-    delegate :persisted?, :to_model, :to_key, :to_param, :to_partial_path, to: :model
-    attr_reader :model
+  class Base
+    include ActiveModel::ForbiddenAttributesProtection
 
     def initialize(model)
       @model = model
 
-      @forms = []
-      populate_forms
+      @backing_form = BackingForm.new(model)
+      associations.each { |a| @backing_form.add_association(a) }
+      attribute_names.each do |(names, options)|
+        @backing_form.build_attributes(names, options)
+      end
+    end
+
+    delegate :to_model, :valid?, to: :backing_form
+
+    def submit(params)
+      @backing_form.attributes = sanitize_for_mass_assignment(params)
     end
 
     def save
-      return false unless valid?
-
-      if ActiveRecord::Base.transaction { model.save }
-        forms.each(&:reset)
-      end
+      ActiveRecord::Base.transaction { model.save } if valid?
     end
 
     class << self
       attr_accessor :main_model
-      delegate :reflect_on_association, to: :model_class
 
       def attributes(*names)
-        options = names.pop if names.last.is_a?(Hash)
-
-        if options && options[:required]
-          validates_presence_of *names
-        end
-
-        names.each do |attribute|
-          delegate attribute, "#{attribute}=", to: :model
-        end
+        attribute_names.push [names, names.extract_options!].compact
       end
-
-      alias_method :attribute, :attributes
+      alias :attribute :attributes
 
       def association(name, options = {}, &block)
-        define_method(name) { instance_variable_get("@#{name}").models }
-        define_method("#{name}_attributes=") {}
-
-        forms << [name, options, block]
-      end
-
-      def forms
-        @forms ||= []
+        associations << [name, options, block]
       end
 
       private
@@ -58,14 +41,9 @@ module ActiveForm
     end
 
     private
+      attr_reader :backing_form
 
-    def populate_forms
-      self.class.forms.each do |(name, options, block)|
-        FormDefinition.new(name, block, options).build_for(model).tap do |form|
-          forms << form
-          instance_variable_set("@#{name}", form)
-        end
-      end
-    end
+      mattr_reader(:attribute_names) { [] }
+      mattr_reader(:associations)    { [] }
   end
 end
